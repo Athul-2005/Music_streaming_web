@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results for "{{ query }}" | AK Music</title>
+    <link rel="stylesheet" href="{% static 'homestyle.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .search-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .search-title {
+            flex: 1;
+        }
+        
+        .back-link {
+            background-color: var(--background-highlight);
+            color: var(--text-color);
+            padding: 0.6rem 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition-default);
+        }
+        
+        .back-link:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .search-highlight {
+            color: var(--primary-color);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="header-title">
+                <i class="fas fa-music"></i> AK Music
+            </h1>
+            <div class="logout-wrapper">
+                <a href="{% url 'home' %}" class="btn-logout">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </div>
+        <div class="search-bar-wrapper">
+            <form class="search-form" action="{% url 'search' %}" method="get">
+                <input class="search-input" type="search" placeholder="Search songs, artists..." name="search" aria-label="Search" value="{{ query }}">
+                <button class="search-button" type="submit">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+    </header>
+    
+    <main>
+        <section>
+            <div class="search-header">
+                <h2 class="search-title">
+                    Results for "<span class="search-highlight">{{ query }}</span>"
+                </h2>
+                <a href="{% url 'home' %}" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+            
+            {% if results %}
+                <ul class="songs-grid">
+                    {% for song in results %}
+                        <li>
+                            <a href="{% url 'playsong' song.id %}" class="song-card">
+                                <img src="{{ song.mimage.url }}" alt="{{ song.sname }} image" class="song-image">
+                                <div class="song-info">
+                                    <div class="song-title">{{ song.sname }}</div>
+                                    <div class="song-artist">{{ song.Artist }}</div>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="no-results">
+                    <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>No results found for "{{ query }}".</p>
+                    <p>Try searching for something else or explore our featured songs.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 AK Music Streaming. All rights reserved.</p>
+    </footer>
+</body>
+</html>

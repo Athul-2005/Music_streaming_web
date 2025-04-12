@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing: {{ song.sname }} | AK Music</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'player.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <a href="{% url 'home' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1>Now Playing</h1>
+    </header>
+    
+    <main>
+        <div class="player-container">
+            <img src="{{ song.mimage.url }}" alt="{{ song.sname }} image" class="album-art">
+            
+            <div class="song-info">
+                <div class="song-title">{{ song.sname }}</div>
+                <div class="song-artist">{{ song.Artist }}</div>
+            </div>
+            
+            <div class="player-controls">
+                <form action="{% url 'playsong' prev_id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="control-button previous">
+                        <i class="fas fa-backward"></i>
+                    </button>
+                </form>
+                
+                <div class="audio-container">
+                    <audio controls autoplay>
+                        <source src="{{ song.audio.url }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                
+                <form action="{% url 'playsong' next_id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="control-button next">
+                        <i class="fas fa-forward"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <form action="{% url 'add_to_playlist' song.id %}" method="post" class="playlist-form">
+                {% csrf_token %}
+                <label for="playlist">Add to Playlist:</label>
+                <select name="playlist" id="playlist" class="playlist-select" required>
+                    <option value="" disabled selected hidden>Select a playlist</option>
+                    {% for playlist in playlists %}
+                        <option value="{{ playlist.id }}">{{ playlist.pname }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="add-to-playlist-btn">
+                    <i class="fas fa-plus"></i> Add to Playlist
+                </button>
+            </form>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 AK Music Streaming. All rights reserved.</p>
+    </footer>
+</body>
+</html>

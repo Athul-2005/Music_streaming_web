@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ playlist.pname }} | AK Music</title>
+    <link rel="stylesheet" href="{% static 'homestyle.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .playlist-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .playlist-info {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .playlist-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .song-count {
+            color: var(--text-secondary);
+        }
+        
+        .playlist-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .action-button {
+            background-color: var(--background-highlight);
+            color: var(--text-color);
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition-default);
+            font-size: 0.9rem;
+        }
+        
+        .action-button:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .playlist-songs {
+            margin-top: 2rem;
+        }
+        
+        .song-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            background-color: var(--background-highlight);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            transition: var(--transition-default);
+        }
+        
+        .song-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .song-index {
+            margin-right: 1rem;
+            color: var(--text-secondary);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .song-details {
+            flex: 1;
+        }
+        
+        .song-remove {
+            color: var(--text-secondary);
+            transition: var(--transition-default);
+        }
+        
+        .song-remove:hover {
+            color: #ff5757;
+        }
+        
+        .empty-playlist {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .modal-content {
+            background-color: var(--background-elevation, #1e1e1e);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: var(--border-radius, 8px);
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close {
+            color: var(--text-secondary, #aaa);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: var(--text-color, #fff);
+        }
+        
+        .modal-form input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background-color: var(--background-highlight, #2e2e2e);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius, 8px);
+            color: var(--text-color, #fff);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="header-title">
+                <i class="fas fa-music"></i> AK Music
+            </h1>
+            <div class="logout-wrapper">
+                <a href="{% url 'home' %}" class="btn-logout">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section>
+            <div class="playlist-header">
+                <div class="playlist-info">
+                    <h1 class="playlist-title">{{ playlist.pname }}</h1>
+                    <div class="song-count">{{ playlist.songs.count }} songs</div>
+                </div>
+                <div class="playlist-actions">
+                    <button id="renameButton" class="action-button">
+                        <i class="fas fa-edit"></i> Rename
+                    </button>
+                    <form action="{% url 'delete_playlist' playlist.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="action-button">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="playlist-songs">
+                {% if playlist.songs.all %}
+                    <ul style="display: block;">
+                        {% for song in playlist.songs.all %}
+                            <li style="display: block; margin-bottom: 0.5rem;">
+                                <a href="{% url 'playsong' song.id %}" class="song-item">
+                                    <span class="song-index">{{ forloop.counter }}</span>
+                                    <div class="song-details">
+                                        <div class="song-title">{{ song.sname }}</div>
+                                        <div class="song-artist">{{ song.Artist }}</div>
+                                    </div>
+                                    <form action="{% url 'remove_from_playlist' playlist.id song.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="song-remove">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty-playlist">
+                        <i class="fas fa-music" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>This playlist is empty. Add songs to get started!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+    
+    <!-- Rename Modal -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Rename Playlist</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="renameForm" action="{% url 'rename_playlist' playlist.id %}" method="post" class="modal-form">
+                {% csrf_token %}
+                <input type="text" name="new_name" id="new_name" placeholder="Enter new playlist name" value="{{ playlist.pname }}" required>
+                <div class="modal-buttons">
+                    <button type="button" class="action-button" id="cancelRename">Cancel</button>
+                    <button type="submit" class="action-button">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 AK Music Streaming. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        // Get the modal
+        const modal = document.getElementById("renameModal");
+        
+        // Get the button that opens the modal
+        const renameBtn = document.getElementById("renameButton");
+        
+        // Get the <span> element that closes the modal
+        const closeBtn = document.querySelector(".close");
+        
+        // Get the cancel button
+        const cancelBtn = document.getElementById("cancelRename");
+        
+        // When the user clicks the button, open the modal
+        renameBtn.onclick = function() {
+            modal.style.display = "block";
+        }
+        
+        // When the user clicks on <span> (x), close the modal
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        // When the user clicks on cancel button, close the modal
+        cancelBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

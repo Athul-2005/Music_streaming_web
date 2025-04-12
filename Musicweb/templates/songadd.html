@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Song</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: url("{% static 'img/download.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px #000;
+        }
+        form {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 30px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background: #f0f0f0;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2b69dd;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #760ca0;
+        }
+        img#imagePreview {
+            display: block;
+            margin: 10px auto;
+            max-width: 200px;
+            max-height: 200px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+        }
+        .back-link {
+            background-color: var(--background-highlight);
+            color: var(--text-color);
+            padding: 0.6rem 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition-default);
+        }
+        
+        .back-link:hover {
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <a href="{% url 'home' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </header>
+    <h1>Add a New Song</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="sname">Song Name:</label>
+        <input type="text" id="sname" name="sname" required><br><br>
+        
+        <label for="mimage">Music Image:</label>
+        <input type="file" id="mimage" name="mimage" required onchange="previewImage(event)">
+        
+        <img id="imagePreview" src="#" alt="Image Preview" style="display:none;"><br><br>
+        
+        <label for="audio">Audio File:</label>
+        <input type="file" id="audio" name="audio" required ><br><br>
+        <label for="sgenre">Genre:</label>
+        <input type="text" id="sgenre" name="sgenre" required><br><br>
+        
+        <label for="artist">Artist:</label>
+        <input type="text" id="artist" name="artist" required><br><br>
+        
+        <button type="submit">Add Song</button>
+    </form>
+
+    <form method="post" action="{% url 'delete_song_by_name' %}" style="margin-top: 20px;">
+        {% csrf_token %}
+        <label for="song_name">Delete Song by Name:</label>
+        <select name="song_name" id="song_name" required>
+            <option value="" selected hidden>Select a song</option>
+            {% for song in Songs %}
+                <option value="{{ song.sname }}">{{ song.sname }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="background-color: red; color: white; margin-top: 10px;">Delete Song</button>
+    </form>
+
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('imagePreview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+</body>
+</html>

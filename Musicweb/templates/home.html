@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AK Music - Stream Your Favorite Songs</title>
+    <link rel="stylesheet" href="{% static 'homestyle.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="header-title">
+                <i class="fas fa-music"></i> AK Music
+            </h1>
+            <div class="logout-wrapper">
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="search-bar-wrapper">
+            <form class="search-form" action="{% url 'search' %}" method="get">
+                <input class="search-input" type="search" placeholder="Search songs, artists..." name="search" aria-label="Search">
+                <button class="search-button" type="submit">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+    </header>
+    
+    <main>
+        <section>
+            <h2><i class="fas fa-star"></i> Featured Songs</h2>
+            <ul class="songs-grid">
+                {% for song in Songs %}
+                    <li>
+                        <a href="{% url 'playsong' song.id %}" class="song-card">
+                            <img src="{{ song.mimage.url }}" alt="{{ song.sname }} image" class="song-image">
+                            <div class="song-info">
+                                <div class="song-title">{{ song.sname }}</div>
+                                <div class="song-artist">{{ song.Artist }}</div>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        
+        <section>
+            <h2><i class="fas fa-list"></i> Your Playlists</h2>
+            <ul class="playlists-grid">
+                {% for playlist in playlists %}
+                    <li>
+                        <a href="{% url 'playlist' playlist.id %}" class="playlist-card">
+                            <div class="playlist-name">{{ playlist.pname }}</div>
+                            <div class="playlist-count">{{ playlist.songs.count }} songs</div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="create-playlist">
+                <a href="{% url 'create_playlist' %}" class="create-playlist-btn">
+                    <i class="fas fa-plus"></i> Create New Playlist
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-music"></i> AK Music
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <p class="copyright">&copy; 2025 AK Music Streaming. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
